@@ -31,7 +31,7 @@ STATE="$HOME/.fabonic_deployed"
 is_master_only() {
     case "$1" in
         admin/*|public/*) return 0 ;;
-        api/reset-demo.php|api/run-tenant-crons.php|api/auto-provision-cron.php|api/trial-cron.php) return 0 ;;
+        api/reset-demo.php|api/run-tenant-crons.php|api/auto-provision-cron.php|api/trial-cron.php|api/provision-tenant.php) return 0 ;;
         api/saas-admin.php|api/sales-agent.php|api/send-trial-request.php|api/check-slug.php|api/fix-subscription.php) return 0 ;;
     esac
     return 1
