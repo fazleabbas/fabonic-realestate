@@ -5,7 +5,9 @@
 #
 #   bash ~/repo/deploy/release.sh --check            compare GitHub's code with what is live; changes nothing
 #   bash ~/repo/deploy/release.sh --check <file>     show the differences in one file
-#   bash ~/repo/deploy/release.sh --baseline         record GitHub's code as what is live (first time only)
+#   bash ~/repo/deploy/release.sh --first --dry-run  first time: show every file that differs from GitHub
+#   bash ~/repo/deploy/release.sh --first            first time: deploy every file that differs, then record
+#   bash ~/repo/deploy/release.sh --baseline         first time, if the server already matches: just record
 #   bash ~/repo/deploy/release.sh --dry-run          show what the next deploy would do; changes nothing
 #   bash ~/repo/deploy/release.sh                    deploy (asks before changing anything)
 #
@@ -43,14 +45,17 @@ is_never_deployed() {
     return 1
 }
 
-MODE="deploy"
-case "${1:-}" in
-    --check)    MODE="check" ;;
-    --baseline) MODE="baseline" ;;
-    --dry-run)  MODE="dry" ;;
-    "")         ;;
-    *) echo "unknown option: $1" >&2; exit 1 ;;
-esac
+MODE="deploy"; FIRST=0; CHECK_FILE=""
+for arg in "$@"; do
+    case "$arg" in
+        --check)    MODE="check" ;;
+        --baseline) MODE="baseline" ;;
+        --dry-run)  MODE="dry" ;;
+        --first)    FIRST=1 ;;
+        -*) echo "unknown option: $arg" >&2; exit 1 ;;
+        *)  CHECK_FILE="$arg" ;;
+    esac
+done
 
 # Kept in the template (scripts, schema, docs) but not copied to tenants.
 is_template_only() {
@@ -71,8 +76,8 @@ NEW=$(git rev-parse origin/main)
 # ---------------------------------------------------------------- check
 if [ "$MODE" = "check" ]; then
     git merge -q --ff-only origin/main
-    if [ -n "${2:-}" ]; then
-        diff -u "$(live_path "$2")" "$REPO/$2" | head -200
+    if [ -n "$CHECK_FILE" ]; then
+        diff -u "$(live_path "$CHECK_FILE")" "$REPO/$CHECK_FILE" | head -200
         exit 0
     fi
     same=0; differ=(); missing=()
@@ -107,20 +112,34 @@ if [ "$MODE" = "baseline" ]; then
 fi
 
 # ---------------------------------------------------------------- deploy / dry run
-if [ ! -f "$STATE" ]; then
-    echo "First run: compare with --check, then record the live version with --baseline." >&2
-    exit 1
-fi
-LAST=$(cat "$STATE")
-if [ "$LAST" = "$NEW" ]; then echo "Already up to date ($(git log -1 --format='%h %s' "$NEW"))."; exit 0; fi
-
-echo "New changes since the last deploy:"
-git log --format='    %h  %ad  %s' --date=short "$LAST..$NEW"
-echo
-
 TMP=$(mktemp)
-git diff --name-only --diff-filter=ACMRT "$LAST" "$NEW" > "$TMP"; mapfile -t CHANGED < "$TMP"
-git diff --name-only --diff-filter=D "$LAST" "$NEW" > "$TMP";     mapfile -t DELETED < "$TMP"
+if [ ! -f "$STATE" ]; then
+    if [ "$FIRST" != 1 ]; then
+        rm -f "$TMP"
+        echo "First run: see the differences with --check, then deploy them with --first." >&2
+        exit 1
+    fi
+    # First deploy: everything in GitHub that is not already identical on the server.
+    git merge -q --ff-only origin/main
+    echo "First deploy of $(git log -1 --format='%h %s' "$NEW")"
+    echo
+    : > "$TMP"
+    git ls-files | while read -r f; do
+        is_never_deployed "$f" && continue
+        cmp -s "$(live_path "$f")" "$REPO/$f" || echo "$f" >> "$TMP"
+    done
+    mapfile -t CHANGED < "$TMP"
+    DELETED=()
+else
+    [ "$FIRST" = 1 ] && { rm -f "$TMP"; echo "Already set up — run without --first." >&2; exit 1; }
+    LAST=$(cat "$STATE")
+    if [ "$LAST" = "$NEW" ]; then rm -f "$TMP"; echo "Already up to date ($(git log -1 --format='%h %s' "$NEW"))."; exit 0; fi
+    echo "New changes since the last deploy:"
+    git log --format='    %h  %ad  %s' --date=short "$LAST..$NEW"
+    echo
+    git diff --name-only --diff-filter=ACMRT "$LAST" "$NEW" > "$TMP"; mapfile -t CHANGED < "$TMP"
+    git diff --name-only --diff-filter=D "$LAST" "$NEW" > "$TMP";     mapfile -t DELETED < "$TMP"
+fi
 rm -f "$TMP"
 
 TENANT_FILES=(); MASTER_FILES=(); TEMPLATE_FILES=(); MIGRATE=0
