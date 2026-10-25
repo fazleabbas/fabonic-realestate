@@ -1,0 +1,21 @@
+# FIS Real Estate — upload tree hardening.
+# Nothing here may ever be executed. Uploads are extension-whitelisted in
+# uploadFile(), this is defence in depth if that whitelist is ever widened.
+<FilesMatch "\.(php|phps|phtml|php[0-9]|phar|pl|py|cgi|sh|shtml|htaccess|htpasswd)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+RemoveHandler .php .phtml .phar .cgi .pl .py
+RemoveType .php .phtml .phar
+
+Options -Indexes -ExecCGI
+
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+</IfModule>

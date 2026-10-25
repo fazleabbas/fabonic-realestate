@@ -1,0 +1,28 @@
+# ---- Secrets: never commit ----
+config/database.php
+config/secrets.php
+deploy/demo-database.php
+
+# ---- Client data ----
+# Uploaded files stay on the server; only the .htaccess guards are code.
+uploads/**
+!uploads/**/
+!uploads/**/.htaccess
+db_backups/
+exports/*
+temp/*
+# Tandika spreadsheets and seeds: real tenants' names, phones and TINs.
+stuffs/
+
+# ---- Business documents, not code ----
+agreements/
+
+# ---- Leftovers ----
+*.bak.php
+*.bak
+~$*
+.claude/
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
