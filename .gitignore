@@ -1,0 +1,31 @@
+# ---- Secrets: never commit ----
+config/database.php
+config/secrets.php
+deploy/demo-database.php
+
+# ---- Client data ----
+# Uploaded files stay on the server; only the .htaccess guards are code.
+uploads/**
+!uploads/**/
+!uploads/**/.htaccess
+db_backups/
+exports/*
+temp/*
+# Client spreadsheets and seeds: real tenants' names, phones and TINs.
+stuffs/
+
+# ---- Business documents, not code ----
+agreements/
+
+# ---- Leftovers ----
+*.bak.php
+*.bak
+~$*
+.claude/
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+
+# ---- Server notes: cPanel user, DB names, key history ----
+DEPLOY_REAL_CO_TZ.md
