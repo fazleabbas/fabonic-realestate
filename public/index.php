@@ -343,7 +343,7 @@ $year = date('Y');
                 <div class="price-card">
                     <h4>Basic</h4>
                     <p class="text-muted-2 mb-3" style="font-size:.9rem;">For small landlords getting started.</p>
-                    <div class="price-amt">TZS 9,999<span style="font-size:1rem;color:var(--muted);font-weight:500;">/unit/mo</span></div>
+                    <div class="price-amt">TZS 999<span style="font-size:1rem;color:var(--muted);font-weight:500;">/unit/mo</span></div>
                     <ul>
                         <li><i class="bi bi-check-circle-fill"></i> Properties, units &amp; tenants</li>
                         <li><i class="bi bi-check-circle-fill"></i> Leases &amp; rent tracking</li>
@@ -358,7 +358,7 @@ $year = date('Y');
                     <span class="ribbon">MOST POPULAR</span>
                     <h4>Professional</h4>
                     <p class="text-muted-2 mb-3" style="font-size:.9rem;">Everything you need to run at scale.</p>
-                    <div class="price-amt">TZS 14,999<span style="font-size:1rem;color:var(--muted);font-weight:500;">/unit/mo</span></div>
+                    <div class="price-amt">TZS 1,499<span style="font-size:1rem;color:var(--muted);font-weight:500;">/unit/mo</span></div>
                     <ul>
                         <li><i class="bi bi-check-circle-fill"></i> Everything in Basic</li>
                         <li><i class="bi bi-check-circle-fill"></i> WhatsApp reminders</li>
@@ -372,7 +372,7 @@ $year = date('Y');
                 <div class="price-card">
                     <h4>Enterprise</h4>
                     <p class="text-muted-2 mb-3" style="font-size:.9rem;">For large portfolios &amp; agencies.</p>
-                    <div class="price-amt">TZS 19,999<span style="font-size:1rem;color:var(--muted);font-weight:500;">/unit/mo</span></div>
+                    <div class="price-amt">TZS 1,999<span style="font-size:1rem;color:var(--muted);font-weight:500;">/unit/mo</span></div>
                     <ul>
                         <li><i class="bi bi-check-circle-fill"></i> Everything in Professional</li>
                         <li><i class="bi bi-check-circle-fill"></i> Maintenance tracking</li>
